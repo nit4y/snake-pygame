@@ -23,22 +23,22 @@ class Bomb(object):
             cur_x = self.location.x - current_radius
             cur_y = self.location.y
             #we will use 4 loops, once for each diagonal direction
-            for i in range(current_radius): #UP + RIGHT
+            for i in range(current_radius+1): #UP + RIGHT
                 if(0 <= cur_x + i <= width) and (0 <= cur_y + i <= height):
                     gd.draw_cell(cur_x,cur_y,"orange")
                 else:
                     is_in_bound = False
-            for i in range(current_radius): #DOWN + RIGHT
+            for i in range(current_radius+1): #DOWN + RIGHT
                 if(0 <= cur_x + i <= width) and (0 <= cur_y - i <= height):
                     gd.draw_cell(cur_x,cur_y,"orange")
                 else:
                     is_in_bound = False
-            for i in range(current_radius): #DOWN + LEFT
+            for i in range(current_radius+1): #DOWN + LEFT
                 if(0 <= cur_x - i <= width) and (0 <= cur_y - i <= height):
                     gd.draw_cell(cur_x,cur_y,"orange")
                 else:
                     is_in_bound = False
-            for i in range(current_radius): #UP + LEFT
+            for i in range(current_radius+1): #UP + LEFT
                 if(0 <= cur_x - i <= width) and (0 <= cur_y + i <= height):
                     gd.draw_cell(cur_x,cur_y,"orange")
                 else:
@@ -50,4 +50,4 @@ class Bomb(object):
     def detonate(self, gd :GameDisplay) -> (bool):
         for i in range(self.radius):
             if self.draw_blast(gd,i) == False:
-                return
+                return False
