@@ -1,4 +1,4 @@
-
+import game_parameters
 from game_display import GameDisplay
 from location import Location
 
@@ -9,8 +9,45 @@ class Bomb(object):
         self.radius = radius
         self.timer = timer
     
-    def draw_blast(self, gd :GameDisplay):
-        gd.draw_cell(self.x)
+    def draw_blast(self, gd :GameDisplay,current_radius) -> (bool):
+        width = game_parameters.WIDTH #easy parameters for width and height
+        height = game_parameters.HEIGHT
+        #draws the current blast
+        #returns True if uninteruped
+        #returns False if the blast has collided and the bomb must be stopped
+        is_in_bound = True #initliazing the bool
+        if current_radius == 0:
+            gd.draw_cell(self.location.x, self.location.y, "orange")
+        else: #if bigger than 0
+            #we initalize the starting location for diamond shape movment
+            cur_x = self.location.x - current_radius
+            cur_y = self.location.y
+            #we will use 4 loops, once for each diagonal direction
+            for i in range(current_radius): #UP + RIGHT
+                if(0 <= cur_x + i <= width) and (0 <= cur_y + i <= height):
+                    gd.draw_cell(cur_x,cur_y,"orange")
+                else:
+                    is_in_bound = False
+            for i in range(current_radius): #DOWN + RIGHT
+                if(0 <= cur_x + i <= width) and (0 <= cur_y - i <= height):
+                    gd.draw_cell(cur_x,cur_y,"orange")
+                else:
+                    is_in_bound = False
+            for i in range(current_radius): #DOWN + LEFT
+                if(0 <= cur_x - i <= width) and (0 <= cur_y - i <= height):
+                    gd.draw_cell(cur_x,cur_y,"orange")
+                else:
+                    is_in_bound = False
+            for i in range(current_radius): #UP + LEFT
+                if(0 <= cur_x - i <= width) and (0 <= cur_y + i <= height):
+                    gd.draw_cell(cur_x,cur_y,"orange")
+                else:
+                    is_in_bound = False
+        #now we finished painting all cells in diamond shape
+        #bool is_in_bound will remember if one of the cells exited
+        return is_in_bound
 
-    def detonate(self, gd :GameDisplay):
+    def detonate(self, gd :GameDisplay) -> (bool):
         for i in range(self.radius):
+            if self.draw_blast(gd,i) == False:
+                return
