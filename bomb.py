@@ -1,7 +1,7 @@
 import game_parameters
 from game_display import GameDisplay
 from location import Location
-
+import consts
 
 class Bomb(object):
     def __init__(self, x, y, radius, timer) -> None:
@@ -9,6 +9,9 @@ class Bomb(object):
         self.radius = radius
         self.timer = timer
     
+    def draw_blast_cell(self, gd, cur_x, cur_y):
+        gd.draw_cell(cur_x, cur_y, consts.ORANGE)
+
     def draw_blast(self, gd :GameDisplay,current_radius) -> (bool):
         width = game_parameters.WIDTH #easy parameters for width and height
         height = game_parameters.HEIGHT
@@ -17,7 +20,7 @@ class Bomb(object):
         #returns False if the blast has collided and the bomb must be stopped
         is_in_bound = True #initliazing the bool
         if current_radius == 0:
-            gd.draw_cell(self.location.x, self.location.y, "orange")
+            self.draw_blast_cell(self.location.x, self.location.y)
         else: #if bigger than 0
             #we initalize the starting location for diamond shape movment
             cur_x = self.location.x - current_radius
@@ -25,22 +28,22 @@ class Bomb(object):
             #we will use 4 loops, once for each diagonal direction
             for i in range(current_radius+1): #UP + RIGHT
                 if(0 <= cur_x + i <= width) and (0 <= cur_y + i <= height):
-                    gd.draw_cell(cur_x,cur_y,"orange")
+                    self.draw_blast_cell(cur_x, cur_y)
                 else:
                     is_in_bound = False
             for i in range(current_radius+1): #DOWN + RIGHT
                 if(0 <= cur_x + i <= width) and (0 <= cur_y - i <= height):
-                    gd.draw_cell(cur_x,cur_y,"orange")
+                    self.draw_blast_cell(cur_x, cur_y)
                 else:
                     is_in_bound = False
             for i in range(current_radius+1): #DOWN + LEFT
                 if(0 <= cur_x - i <= width) and (0 <= cur_y - i <= height):
-                    gd.draw_cell(cur_x,cur_y,"orange")
+                    self.draw_blast_cell(cur_x, cur_y)
                 else:
                     is_in_bound = False
             for i in range(current_radius+1): #UP + LEFT
                 if(0 <= cur_x - i <= width) and (0 <= cur_y + i <= height):
-                    gd.draw_cell(cur_x,cur_y,"orange")
+                    self.draw_blast_cell(cur_x, cur_y)
                 else:
                     is_in_bound = False
         #now we finished painting all cells in diamond shape

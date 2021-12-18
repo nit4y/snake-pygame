@@ -1,0 +1,3 @@
+
+ORANGE = "orange"
+GREEN = "green"
