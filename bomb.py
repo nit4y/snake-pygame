@@ -20,7 +20,7 @@ class Bomb(object):
         #returns False if the blast has collided and the bomb must be stopped
         is_in_bound = True #initliazing the bool
         if current_radius == 0:
-            self.draw_blast_cell(self.location.x, self.location.y)
+            self.draw_blast_cell(gd,self.location.x, self.location.y)
         else: #if bigger than 0
             #we initalize the starting location for diamond shape movment
             cur_x = self.location.x - current_radius
@@ -28,22 +28,22 @@ class Bomb(object):
             #we will use 4 loops, once for each diagonal direction
             for i in range(current_radius+1): #UP + RIGHT
                 if(0 <= cur_x + i <= width) and (0 <= cur_y + i <= height):
-                    self.draw_blast_cell(cur_x, cur_y)
+                    self.draw_blast_cell(gd,cur_x, cur_y)
                 else:
                     is_in_bound = False
             for i in range(current_radius+1): #DOWN + RIGHT
                 if(0 <= cur_x + i <= width) and (0 <= cur_y - i <= height):
-                    self.draw_blast_cell(cur_x, cur_y)
+                    self.draw_blast_cell(gd,cur_x, cur_y)
                 else:
                     is_in_bound = False
             for i in range(current_radius+1): #DOWN + LEFT
                 if(0 <= cur_x - i <= width) and (0 <= cur_y - i <= height):
-                    self.draw_blast_cell(cur_x, cur_y)
+                    self.draw_blast_cell(gd,cur_x, cur_y)
                 else:
                     is_in_bound = False
             for i in range(current_radius+1): #UP + LEFT
                 if(0 <= cur_x - i <= width) and (0 <= cur_y + i <= height):
-                    self.draw_blast_cell(cur_x, cur_y)
+                    self.draw_blast_cell(gd,cur_x, cur_y)
                 else:
                     is_in_bound = False
         #now we finished painting all cells in diamond shape
@@ -54,3 +54,6 @@ class Bomb(object):
         for i in range(self.radius):
             if self.draw_blast(gd,i) == False:
                 return False
+
+    def draw_bomb(self, gd: GameDisplay):
+        gd.draw_cell(self.location.x, self.location.y, consts.RED)

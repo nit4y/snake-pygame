@@ -4,8 +4,8 @@ import game_display as gd
 from consts import BLACK
 class Snake(object):
     def __init__(self) -> None:
-        third = SnakeNode(10, 12, None, None)
-        second = SnakeNode(10, 11, third, None)
+        third = SnakeNode(10, 8, None, None)
+        second = SnakeNode(10, 9, third, None)
         self.head = SnakeNode(10, 10, second, None)
         third.previous = second
         second.previous = self.head
@@ -22,13 +22,13 @@ class Snake(object):
     
     def calc_new_head_location(self) -> Location:
         if self.direction == "Left":
-            return Location(self.head.location.x, self.head.location.y-1)
-        elif self.direction == "Right":
-            return Location(self.head.location.x, self.head.location.y+1)
-        elif self.direction == "Up":
             return Location(self.head.location.x-1, self.head.location.y)
-        elif self.direction == "Down":
+        elif self.direction == "Right":
             return Location(self.head.location.x+1, self.head.location.y)
+        elif self.direction == "Up":
+            return Location(self.head.location.x, self.head.location.y+1)
+        elif self.direction == "Down":
+            return Location(self.head.location.x, self.head.location.y-1)
         return None
 
     def movement(self):
