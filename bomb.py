@@ -8,6 +8,7 @@ class Bomb(object):
         self.location = Location(x, y)
         self.radius = radius
         self.timer = timer
+        self.blast_length = 0
     
     def draw_blast_cell(self, gd, cur_x, cur_y):
         gd.draw_cell(cur_x, cur_y, consts.ORANGE)

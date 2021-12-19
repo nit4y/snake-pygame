@@ -48,4 +48,11 @@ class Snake(object):
             gd.draw_cell(runner.location.x, runner.location.y, BLACK)
             runner = runner.next
         
-            
+    def get_locations(self):
+        list_of_locations = []
+        runner = self.head
+        while runner.next != None:
+            location_to_add = runner.location
+            list_of_locations.append(location_to_add)
+            runner = runner.next
+        return list_of_locations
