@@ -5,6 +5,7 @@ from snake import Snake
 from bomb import Bomb
 from apple import Apple
 from game_display import GameDisplay
+import consts
 
 # shalom nitay
 #LEGAL_DIRECTIONS = ["Up","Down","Left","Right"]
@@ -27,9 +28,9 @@ def set_snake_direction(snake: Snake, key_clicked: str):
 
 def draw_board(snake: Snake, apples: list[Apple], bomb: Bomb, gd: GameDisplay):
     snake.draw_snake(gd)
-    bomb.draw_bomb(gd)
     for apple in apples:
         apple.draw(gd)
+    draw_bomb(bomb,gd)
 
 
 def place_single_apple(snake, bomb, apples: list):
@@ -68,8 +69,7 @@ def place_bomb(snake):
 def check_collision(snake: Snake, apples: list[Apple], bomb: Bomb) -> bool:
     # WE CHECK: Snake self collision, touching bomb, eating apple
     # WE UPDATE: score, lengthing snake, game ending
-    # start with checking snake self collision
-    if has_snake_touched_himself(snake):# or has_bomb_hurt_snake(snake, bomb.get_locations):
+    if has_snake_touched_himself(snake) or has_bomb_hurt_snake(snake, bomb.get_locations()):
         return False
     if has_snake_eaten_apple(snake, apples):
         snake.eat_apple()
@@ -78,7 +78,7 @@ def check_collision(snake: Snake, apples: list[Apple], bomb: Bomb) -> bool:
 
 def has_bomb_hurt_snake(snake: Snake, bomb_locations: list[Location]) -> bool:
     for blast_location in bomb_locations:
-        runner = snake.head.location
+        runner = snake.head
         while runner.next is not None:
             if blast_location.equals(runner.location):
                 return True  # the snake has been bombed back to the stone age
@@ -117,6 +117,9 @@ def set_env() -> tuple[Snake, Bomb, list[Apple]]:
     return (snake, bomb, apples)  
 
 
+
+
+
 def main_loop(gd: GameDisplay) -> None:
     # initialzing the game:
     score = 0
@@ -132,11 +135,30 @@ def main_loop(gd: GameDisplay) -> None:
         if not check_collision(snake, apples, bomb):
             break
 
-        #while bomb.detonate() 
-        
-            
+        #while bomb.detonate()
 
+        #BOAZ TESTS:
+        bomb.advance_to_next_stage() #lowers timer or increaces blast
+        if bomb.is_it_time_for_a_new_bomb():
+            bomb = place_bomb(snake)
+        if has_bomb_hurt_snake(snake,bomb.get_locations()):
+            break
         place_apples(snake, bomb, apples)
         draw_board(snake, apples, bomb, gd)
         gd.end_round()
+    draw_board(snake,apples,bomb,gd)
     gd.end_round()
+
+
+
+def draw_bomb(bomb: Bomb, gd: GameDisplay):
+        bomb_locations = bomb.get_locations()
+        if bomb.timer > 0:
+            x = bomb.location.x
+            y = bomb.location.y
+            gd.draw_cell(x, y, consts.RED)
+        elif bomb.timer == 0:
+            for current_blast_cell in bomb_locations:
+                x = current_blast_cell.x
+                y = current_blast_cell.y
+                gd.draw_cell(x, y, consts.ORANGE)
