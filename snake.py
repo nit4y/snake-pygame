@@ -12,6 +12,8 @@ class Snake(object):
 
         self.direction = "Up"
         self.tail = third
+
+        self.stomach = 0
     
     def set_tail(self, tail):
         self.before_last.next = tail
@@ -39,8 +41,11 @@ class Snake(object):
             new_head.next = self.head
             self.head = new_head
 
-            self.tail = self.tail.previous
-            self.tail.next = None
+            if self.stomach == 0:
+                self.tail = self.tail.previous
+                self.tail.next = None
+            else:
+                self.stomach = self.stomach-1
     
     def draw_snake(self, gd :gd.GameDisplay):
         runner = self.head
@@ -56,3 +61,6 @@ class Snake(object):
             list_of_locations.append(location_to_add)
             runner = runner.next
         return list_of_locations
+    
+    def eat_apple(self):
+        self.stomach+=3

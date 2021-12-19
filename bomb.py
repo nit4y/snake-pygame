@@ -13,7 +13,7 @@ class Bomb(object):
     def draw_blast_cell(self, gd, cur_x, cur_y):
         gd.draw_cell(cur_x, cur_y, consts.ORANGE)
 
-    def draw_blast(self, gd :GameDisplay,current_radius) -> (bool):
+    def draw_blast(self, gd :GameDisplay, current_radius) -> (bool):
         width = game_parameters.WIDTH #easy parameters for width and height
         height = game_parameters.HEIGHT
         #draws the current blast
@@ -21,7 +21,7 @@ class Bomb(object):
         #returns False if the blast has collided and the bomb must be stopped
         is_in_bound = True #initliazing the bool
         if current_radius == 0:
-            self.draw_blast_cell(gd,self.location.x, self.location.y)
+            self.draw_blast_cell(gd, self.location.x, self.location.y)
         else: #if bigger than 0
             #we initalize the starting location for diamond shape movment
             cur_x = self.location.x - current_radius
@@ -52,9 +52,20 @@ class Bomb(object):
         return is_in_bound
 
     def detonate(self, gd :GameDisplay) -> (bool):
-        for i in range(self.radius):
-            if self.draw_blast(gd,i) == False:
-                return False
+        #for i in range(self.radius):
+        #    if self.draw_blast(gd,i) == False:
+        #        return False
+        if self.timer == 0:
+            self.draw_blast()
+            self.blast_length + 1
+            if self.blast_length > self.radius:
+                return True
+        else:
+            self.timer = self.timer-1
+        return False
+
+    def tick_timer(self):
+        self.timer = self.timer - 1 
 
     def draw_bomb(self, gd: GameDisplay):
         gd.draw_cell(self.location.x, self.location.y, consts.RED)
