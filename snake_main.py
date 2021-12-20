@@ -15,7 +15,9 @@ def main_loop(gd: GameDisplay) -> None:
             break
         gd.show_score(game.score)
 
-        if game.bomb_turn_processor():
+        game.bomb_turn_processor()
+
+        if game.has_bomb_hurt_snake():
             break
         
         game.check_for_destroyed_apples()

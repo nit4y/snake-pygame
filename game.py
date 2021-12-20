@@ -181,28 +181,41 @@ class Game(object):
                 return True
         return False
 
-    def process_movement(self, gd: GameDisplay):
+    def process_movement(self, gd: GameDisplay) -> None:
+        """
+        procceses movement of the snake
+        :param gd: :param gd: GameDisplay instance, required to access program keys clicked api
+        """
         key_clicked = gd.get_key_clicked()
         self.snake.set_snake_direction(key_clicked)
         return self.snake.movement()
 
     def set_env(self) -> tuple[Snake, Bomb, list[Apple]]:
+        """
+        sets initial values to all game properties
+        :return: a tuple of these values
+        """
         snake = Snake()
         bomb = self.place_bomb()
         apples = [None, None, None]
         return (snake, bomb, apples)  
 
-    def check_for_destroyed_apples(self):
+
+    def check_for_destroyed_apples(self) -> None:
+        """
+        checks if apples colided with bomb blast. if they were, sets them to none
+        """
         for loc in self.bomb.get_locations():
             for i, apple in enumerate(self.apples):
                 if apple is not None:
                     if loc.equals(apple.location):
                         self.apples[i] = None
-    
-    def bomb_turn_processor(self) -> bool:
+
+
+    def bomb_turn_processor(self) -> None:
+        """
+        handles bomb timer, explosion and placing
+        """
         self.bomb.advance_to_next_stage() #lowers timer or increaces blast
         if self.bomb.is_it_time_for_a_new_bomb():
             self.bomb = self.place_bomb() #creates a new bomb instead of current one
-        if self.has_bomb_hurt_snake():
-            return True
-        return False
