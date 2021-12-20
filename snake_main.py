@@ -38,12 +38,51 @@ def place_single_apple(snake, bomb, apples: list):
     x = apple_data[0]
     y = apple_data[1]
     score = apple_data[2]
-    # TODO test to see if apple spawns on snake/bomb/bomb blast/other apple
+    while not(is_apple_location_legal(x,y,snake,bomb,apples)):
+        apple_data = game_parameters.get_random_apple_data()
+        x = apple_data[0]
+        y = apple_data[1]
+        score = apple_data[2]
     # if passes we place the apple:
     apple = Apple(x, y, score)
     return apple
     # else we reroll apple stats and try again:
     # if the apple has no place to spawn we finish the game. the player won.
+
+def is_apple_location_legal(x,y,snake,bomb,apples):
+    apple_location = Location(x,y)
+    bomb_locations = bomb.get_locations()
+
+    for bomb_location in bomb_locations:
+        if bomb_location.equals(apple_location):
+            return False
+
+    for rival_apple in apples:
+        if rival_apple is not None:
+            if rival_apple.location.equals(apple_location):
+                return False
+
+    runner = snake.head
+    while runner.next is not None:
+        if runner.location.equals(apple_location):
+            return False
+        runner = runner.next
+
+    return True
+
+
+def is_bomb_location_legal(x,y,snake):
+    bomb_location = Location(x,y)
+
+    runner = snake.head
+    while runner.next is not None:
+        if runner.location.equals(bomb_location):
+            return False
+        runner = runner.next
+
+    return True
+
+
 
 
 def place_apples(snake, bomb, apples: list):
@@ -55,13 +94,20 @@ def place_apples(snake, bomb, apples: list):
 
 
 def place_bomb(snake):
+    #randomize bomb data
     bomb_data = game_parameters.get_random_bomb_data()
     x = bomb_data[0]
     y = bomb_data[1]
     radius = bomb_data[2]
     timer = bomb_data[3]
-    # TODO test that the bomb doesn't spawn on any snake nodes
-    # if passes we create the snake, else we reroll stats
+
+    #if it is not good, we will keep randomizing:
+    while not(is_bomb_location_legal(x,y,snake)):
+        bomb_data = game_parameters.get_random_bomb_data()
+        x = bomb_data[0]
+        y = bomb_data[1]
+        radius = bomb_data[2]
+        timer = bomb_data[3]
     bomb = Bomb(x, y, radius, timer)
     return bomb
 
@@ -69,12 +115,11 @@ def place_bomb(snake):
 def check_collision(snake: Snake, apples: list[Apple], bomb: Bomb) -> bool:
     # WE CHECK: Snake self collision, touching bomb, eating apple
     # WE UPDATE: score, lengthing snake, game ending
-    if has_snake_touched_himself(snake) or has_bomb_hurt_snake(snake, bomb.get_locations()):
+    if snake.is_head_out_of_bounds() or has_snake_touched_himself(snake) or has_bomb_hurt_snake(snake, bomb.get_locations()):
         return False
     if has_snake_eaten_apple(snake, apples):
         snake.eat_apple()
     return True
-
 
 def has_bomb_hurt_snake(snake: Snake, bomb_locations: list[Location]) -> bool:
     for blast_location in bomb_locations:
@@ -108,7 +153,7 @@ def has_snake_touched_himself(snake: Snake) -> bool:
 def process_movement(gd: GameDisplay, snake: Snake):
     key_clicked = gd.get_key_clicked()
     set_snake_direction(snake, key_clicked)
-    snake.movement()
+    return snake.movement()
 
 def set_env() -> tuple[Snake, Bomb, list[Apple]]:
     snake = Snake()
@@ -129,7 +174,8 @@ def main_loop(gd: GameDisplay) -> None:
 
     gd.end_round()
     while True:
-        process_movement(gd, snake)
+        if process_movement(gd, snake) == False:
+            break
         # Is snake eating itself, touching bomb or eating apple
         if not check_collision(snake, apples, bomb):
             break
