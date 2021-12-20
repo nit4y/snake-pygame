@@ -7,10 +7,6 @@ from apple import Apple
 from game_display import GameDisplay
 import consts
 
-# shalom nitay
-#LEGAL_DIRECTIONS = ["Up","Down","Left","Right"]
-
-
 def set_snake_direction(snake: Snake, key_clicked: str):
     if (key_clicked == snake.direction):
         pass  # this inforces that the snake can't be pulled forward
@@ -82,16 +78,12 @@ def is_bomb_location_legal(x,y,snake):
 
     return True
 
-
-
-
 def place_apples(snake, bomb, apples: list):
     """ places missing apples, up to 3, marked by None """
     for i, apple in enumerate(apples):
         if apple is None:
             apples[i] = place_single_apple(snake, bomb, apples)
     return apples
-
 
 def place_bomb(snake):
     #randomize bomb data
@@ -112,7 +104,7 @@ def place_bomb(snake):
     return bomb
 
 
-def check_collision(snake: Snake, apples: list[Apple], bomb: Bomb) -> bool:
+def check_snake_collisions(snake: Snake, apples: list[Apple], bomb: Bomb) -> bool:
     # WE CHECK: Snake self collision, touching bomb, eating apple
     # WE UPDATE: score, lengthing snake, game ending
     if snake.is_head_out_of_bounds() or has_snake_touched_himself(snake) or has_bomb_hurt_snake(snake, bomb.get_locations()):
@@ -161,9 +153,12 @@ def set_env() -> tuple[Snake, Bomb, list[Apple]]:
     apples = place_apples(snake, bomb, [None, None, None]) # we fill it with 3 apples
     return (snake, bomb, apples)  
 
-
-
-
+def check_for_destroyed_apples(apples: list[Apple], bomb: Bomb):
+    for loc in bomb.get_locations():
+        for i, apple in enumerate(apples):
+            if apple is not None:
+                if loc.equals(apple.location):
+                    apples[i] = None
 
 def main_loop(gd: GameDisplay) -> None:
     # initialzing the game:
@@ -177,7 +172,7 @@ def main_loop(gd: GameDisplay) -> None:
         if process_movement(gd, snake) == False:
             break
         # Is snake eating itself, touching bomb or eating apple
-        if not check_collision(snake, apples, bomb):
+        if not check_snake_collisions(snake, apples, bomb):
             break
 
         #while bomb.detonate()
@@ -188,13 +183,15 @@ def main_loop(gd: GameDisplay) -> None:
             bomb = place_bomb(snake) #creates a new bomb instead of current one
         if has_bomb_hurt_snake(snake,bomb.get_locations()):
             break
+        #######
+
+        check_for_destroyed_apples(apples, bomb)
+
         place_apples(snake, bomb, apples)
         draw_board(snake, apples, bomb, gd)
         gd.end_round()
     draw_board(snake,apples,bomb,gd)
     gd.end_round()
-
-
 
 def draw_bomb(bomb: Bomb, gd: GameDisplay):
         bomb_locations = bomb.get_locations()
