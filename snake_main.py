@@ -129,7 +129,6 @@ def main_loop(gd: GameDisplay) -> None:
 
     gd.end_round()
     while True:
-
         process_movement(gd, snake)
         # Is snake eating itself, touching bomb or eating apple
         if not check_collision(snake, apples, bomb):
@@ -140,7 +139,7 @@ def main_loop(gd: GameDisplay) -> None:
         #BOAZ TESTS:
         bomb.advance_to_next_stage() #lowers timer or increaces blast
         if bomb.is_it_time_for_a_new_bomb():
-            bomb = place_bomb(snake)
+            bomb = place_bomb(snake) #creates a new bomb instead of current one
         if has_bomb_hurt_snake(snake,bomb.get_locations()):
             break
         place_apples(snake, bomb, apples)

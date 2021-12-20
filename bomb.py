@@ -88,14 +88,16 @@ class Bomb(object):
                 y = current_blast_cell.y
                 gd.draw_cell(x, y, consts.ORANGE)
 
+
+
     def advance_to_next_stage(self):
-        if self.timer == 0:
+        if self.timer <= 0:
             self.blast_length = self.blast_length + 1
         else:
             self.timer = self.timer - 1
 
     def is_it_time_for_a_new_bomb(self):
-        return self.blast_length == self.radius
+        return self.blast_length > self.radius
 
     def get_locations(self):
         if self.timer > 0:
