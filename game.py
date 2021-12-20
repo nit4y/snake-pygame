@@ -5,13 +5,12 @@ from bomb import Bomb
 from location import Location
 from game_display import GameDisplay
 import game_parameters as gp
-import consts
 
 class Game(object):
     """
-    Game is a handler class
+    Game is a the control and management of the game.
+    It has the methods that connects all diffrent components of the game and makes them synergize into the game itself.
     """
-
     def __init__(self) -> None:
         self.score = 0
         self.init = True
@@ -37,7 +36,11 @@ class Game(object):
         return True
 
 
-    def draw_board(self, gd: GameDisplay):
+    def draw_board(self, gd: GameDisplay) -> None:
+        """
+        draws the all the items currently on the game board
+        :param gd: GameDisplay instance, required to access program drawing api
+        """
         self.snake.draw_snake(gd)
         for apple in self.apples:
             if apple is not None:
@@ -46,13 +49,17 @@ class Game(object):
 
 
     def place_single_apple(self) -> Apple:
+        """
+        generates a valid location for a newly generated apple, and creates it.
+        :return: the newly generated apple
+        """
         apple_data = gp.get_random_apple_data()
         x = apple_data[0]
         y = apple_data[1]
         score = apple_data[2]
         used_locations = {}
 
-        while not self.is_apple_location_legal(x, y):
+        while not self.is_apple_location_valid(x, y):
             used_locations[x + "," + y] = None
             if len(used_locations) >= gp.HEIGHT * gp.WIDTH:
                 self.game_over = True
@@ -68,7 +75,13 @@ class Game(object):
         return apple
 
 
-    def is_apple_location_legal(self, x: int, y: int) -> bool:
+    def is_apple_location_valid(self, x: int, y: int) -> bool:
+        """
+        checks if a location for an apple is valid
+        :param x:
+        :param y:
+        :return: True if valid, False otherwise
+        """
         apple_location = Location(x,y)
         bomb_locations = self.bomb.get_locations()
         
@@ -90,11 +103,12 @@ class Game(object):
         return True
 
 
-    def is_bomb_location_legal(self, x: int, y: int) -> bool:
+    def is_bomb_location_valid(self, x: int, y: int) -> bool:
         """
         checks if a given x, y location is viable as a bomb location
-        :param self:
-        :param x: 
+        :param x:
+        :param y:
+        :return: True if viable, False otherwise
         """
         if self.init:
             self.init = False
@@ -109,23 +123,29 @@ class Game(object):
 
         return True
 
-    def place_apples(self):
-        """ places missing apples, up to 3, marked by None """
+    def place_apples(self) -> list[Apple]:
+        """
+        places missing apples, up to 3, marked by None
+        :return: the apples property
+        """
         for i, apple in enumerate(self.apples):
             if apple is None:
                 self.apples[i] = self.place_single_apple()
         return self.apples
 
     def place_bomb(self):
-        #randomize bomb data
+        """
+        generated a bomb with valid location
+        :return: the bomb with valid location
+        """
         bomb_data = gp.get_random_bomb_data()
         x = bomb_data[0]
         y = bomb_data[1]
         radius = bomb_data[2]
         timer = bomb_data[3]
 
-        #if it is not good, we will keep randomizing:
-        while not(self.is_bomb_location_legal(x, y)):
+        # if it is not valid, we will keep on trying:
+        while not(self.is_bomb_location_valid(x, y)):
             bomb_data = gp.get_random_bomb_data()
             x = bomb_data[0]
             y = bomb_data[1]
@@ -135,6 +155,10 @@ class Game(object):
         return bomb
 
     def has_bomb_hurt_snake(self) -> bool:
+        """
+        checks if a bomb blast or the bomb itself colided with the snake
+        :return: True if it did, False otherwise
+        """
         for blast_location in self.bomb.get_locations():
             runner = self.snake.head
             while runner.next is not None:
@@ -145,6 +169,10 @@ class Game(object):
 
 
     def has_snake_eaten_apple(self) -> bool:
+        """
+        checks if the snake colided with an apple
+        :return: True if it did, False otherwise
+        """
         head_location = self.snake.head.location
         for i, apple in enumerate(self.apples):
             if apple is not None and apple.location.equals(head_location):
