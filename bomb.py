@@ -78,3 +78,6 @@ class Bomb(object):
 
             # now we finished painting all cells in diamond shape
             return list_of_all_locations
+    
+    def get_size(self):
+        return len(self.get_locations())

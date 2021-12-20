@@ -1,7 +1,7 @@
 from snake_node import SnakeNode
 from location import Location
 import game_display as gd
-from consts import BLACK
+from consts import BLACK, LEFT, RIGHT, UP, DOWN
 from game_parameters import WIDTH, HEIGHT
 
 
@@ -54,8 +54,7 @@ class Snake(object):
         return True
 
     def is_location_illlegal(self,location: Location):
-        x = location.x
-        y = location.y
+        x, y = location.x, location.y
         return not ((0 <= x < WIDTH) and (0 <= y < HEIGHT))
 
     def draw_snake(self, gd: gd.GameDisplay):
@@ -80,7 +79,28 @@ class Snake(object):
         x = self.head.location.x
         y = self.head.location.y
         if not((0 <= x < WIDTH) and (0 <= y < HEIGHT)):
-            print("YOU ARE OUT OF BOUNDS!!!!!")
             return True
         else:
             return False
+    
+    def set_snake_direction(self, key_clicked: str):
+        if (key_clicked == LEFT) and (self.direction != RIGHT):
+            self.direction = LEFT
+        elif (key_clicked == RIGHT) and (self.direction != LEFT):
+            self.direction = RIGHT
+        elif (key_clicked == UP) and (self.direction != DOWN):
+            self.direction = UP
+        elif (key_clicked == DOWN) and (self.direction != UP):
+            self.direction = DOWN
+        
+    def has_snake_touched_himself(self) -> bool:
+        head_location = self.head.location
+        runner = self.head.next  # we start from second node
+        while runner.next is not None:
+            if head_location.equals(runner.location):
+                return True  # snake HAS touched himself!!
+            runner = runner.next
+        return False
+
+    def get_length(self):
+        return len(self.get_locations())
