@@ -14,6 +14,7 @@ def main_loop(gd: GameDisplay) -> None:
         if not game.check_snake_collisions():
             break
         gd.show_score(game.score)
+
         if game.bomb_turn_processor():
             break
         
