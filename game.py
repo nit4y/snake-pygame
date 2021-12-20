@@ -60,7 +60,7 @@ class Game(object):
         used_locations = {}
 
         while not self.is_apple_location_valid(x, y):
-            used_locations[x + "," + y] = None
+            used_locations[str(x) + "," + str(y)] = None
             if len(used_locations) >= gp.HEIGHT * gp.WIDTH:
                 self.game_over = True
                 return None
