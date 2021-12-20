@@ -8,6 +8,10 @@ import game_parameters as gp
 import consts
 
 class Game(object):
+    """
+    Game is a handler class
+    """
+
     def __init__(self) -> None:
         self.score = 0
         self.init = True
@@ -16,9 +20,14 @@ class Game(object):
         self.bomb = bomb
         self.apples = apples
 
-        self.won = False
+        self.game_over = False
+
 
     def check_snake_collisions(self) -> bool:
+        """
+        checks snake self collision, touching bomb, apple eating
+        :return: True if snake didn't touched himself, or was hitten by a bomb, False otherwise
+        """
         # WE CHECK: Snake self collision, touching bomb, eating apple
         # WE UPDATE: score, lengthing snake, game ending
         if self.snake.is_head_out_of_bounds() or self.snake.has_snake_touched_himself() or self.has_bomb_hurt_snake():
@@ -27,60 +36,39 @@ class Game(object):
             self.snake.eat_apple()
         return True
 
+
     def draw_board(self, gd: GameDisplay):
         self.snake.draw_snake(gd)
         for apple in self.apples:
             if apple is not None:
                 apple.draw(gd)
-        self.draw_bomb(self.bomb, gd)
+        self.bomb.draw_bomb(gd)
 
-    def draw_bomb(self, bomb: Bomb, gd: GameDisplay):
-        bomb_locations = bomb.get_locations()
-        if bomb.timer > 0:
-            x = bomb.location.x
-            y = bomb.location.y
-            gd.draw_cell(x, y, consts.RED)
-        elif bomb.timer == 0:
-            for current_blast_cell in bomb_locations:
-                x = current_blast_cell.x
-                y = current_blast_cell.y
-                gd.draw_cell(x, y, consts.ORANGE)
 
-    def place_single_apple(self):
+    def place_single_apple(self) -> Apple:
         apple_data = gp.get_random_apple_data()
         x = apple_data[0]
         y = apple_data[1]
         score = apple_data[2]
+        used_locations = {}
 
-        while not(self.is_apple_location_legal(x, y)):
+        while not self.is_apple_location_legal(x, y):
+            used_locations[x + "," + y] = None
+            if len(used_locations) >= gp.HEIGHT * gp.WIDTH:
+                self.game_over = True
+                return None
+
             apple_data = gp.get_random_apple_data()
             x = apple_data[0]
             y = apple_data[1]
             score = apple_data[2]
-        # if passes we place the apple:
+
+        # when passes we place the apple
         apple = Apple(x, y, score)
         return apple
-        # else we reroll apple stats and try again:
-        # if the apple has no place to spawn we finish the game. the player won.
-    
-    def check_if_apple_has_place(self):
-        counter = 0
 
-        for apple in self.apples:
-            if apple is not None:
-                counter+=1
 
-        if self.snake is not None:
-            counter+=self.snake.get_length()
-
-        if self.bomb is not None:
-            counter+=self.bomb.get_size()
-        
-        return counter >= gp.HEIGHT * gp.WIDTH
-            
-        
-
-    def is_apple_location_legal(self, x, y):
+    def is_apple_location_legal(self, x: int, y: int) -> bool:
         apple_location = Location(x,y)
         bomb_locations = self.bomb.get_locations()
         
@@ -102,7 +90,7 @@ class Game(object):
         return True
 
 
-    def is_bomb_location_legal(self, x, y):
+    def is_bomb_location_legal(self, x: int, y: int) -> bool:
         """
         checks if a given x, y location is viable as a bomb location
         :param self:
@@ -164,7 +152,6 @@ class Game(object):
                 self.apples[i] = None  # removes the apple
                 return True
         return False
-
 
     def process_movement(self, gd: GameDisplay):
         key_clicked = gd.get_key_clicked()
