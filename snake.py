@@ -3,6 +3,7 @@ from location import Location
 import game_display as gd
 from consts import BLACK, LEFT, RIGHT, UP, DOWN
 from game_parameters import WIDTH, HEIGHT
+from snake_node_head import SnakeNodeHead
 
 
 class Snake(object):
@@ -16,7 +17,7 @@ class Snake(object):
         """
         third = SnakeNode(10, 8, None, None)
         second = SnakeNode(10, 9, third, None)
-        self.head = SnakeNode(10, 10, second, None)
+        self.head = SnakeNodeHead(10, 10, second)
         third.previous = second
         second.previous = self.head
 
@@ -50,8 +51,8 @@ class Snake(object):
         location = self.calc_new_head_location()
         if self.is_location_illegal(location):
             return False
-        if location != None:
-            new_head = SnakeNode(location.x, location.y, None, None)
+        if location is not None:
+            new_head = SnakeNodeHead(location.x, location.y, None)
             self.head.previous = new_head
             new_head.next = self.head
             self.head = new_head

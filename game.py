@@ -22,6 +22,17 @@ class Game(object):
         self.game_over = False
 
 
+    def set_env(self) -> tuple[Snake, Bomb, list[Apple]]:
+        """
+        sets initial values to all game properties
+        :return: a tuple of these values
+        """
+        snake = Snake()
+        bomb = self.place_bomb()
+        apples = [None, None, None]
+        return (snake, bomb, apples)
+
+
     def check_snake_collisions(self) -> bool:
         """
         checks snake self collision, touching bomb, apple eating
@@ -42,10 +53,23 @@ class Game(object):
         :param gd: GameDisplay instance, required to access program drawing api
         """
         self.snake.draw_snake(gd)
+        self.bomb.draw_bomb(gd)
         for apple in self.apples:
             if apple is not None:
                 apple.draw(gd)
+
+    def draw_board_inside_loop_for_tests(self, gd: GameDisplay) -> None:
+        """
+        draws the all the items currently on the game board
+        :param gd: GameDisplay instance, required to access program drawing api
+        """
+        for apple in self.apples:
+            if apple is not None:
+                apple.draw(gd)
+        self.snake.draw_snake(gd)
         self.bomb.draw_bomb(gd)
+
+
 
 
     def place_single_apple(self) -> Apple:
@@ -143,7 +167,6 @@ class Game(object):
         y = bomb_data[1]
         radius = bomb_data[2]
         timer = bomb_data[3]
-
         # if it is not valid, we will keep on trying:
         while not(self.is_bomb_location_valid(x, y)):
             bomb_data = gp.get_random_bomb_data()
@@ -189,16 +212,6 @@ class Game(object):
         key_clicked = gd.get_key_clicked()
         self.snake.set_snake_direction(key_clicked)
         return self.snake.movement()
-
-    def set_env(self) -> tuple[Snake, Bomb, list[Apple]]:
-        """
-        sets initial values to all game properties
-        :return: a tuple of these values
-        """
-        snake = Snake()
-        bomb = self.place_bomb()
-        apples = [None, None, None]
-        return (snake, bomb, apples)  
 
 
     def check_for_destroyed_apples(self) -> None:
